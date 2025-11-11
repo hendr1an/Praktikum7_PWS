@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate API Key</title>
+    <style>
+        /* --- Global Reset & Font --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- Kontainer Form Utama --- */
+        .api-key-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 600px; /* Lebar maksimal form di desktop */
+            border: 1px solid #e8e8e8;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #111;
+        }
+
+        .container-description {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 2rem;
+        }
+
+        /* --- Grup Form (Label + Input) --- */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+        }
+
+        /* --- Tombol Generate --- */
+        .btn-generate {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-generate:hover {
+            background-color: #0056b3;
+        }
+
+        /* --- Area Tampilan Key (Setelah Generate) --- */
+        #keyDisplay {
+            margin-top: 2rem;
+            border-top: 1px solid #eee;
+            padding-top: 2rem;
+        }
+        
+        #keyDisplay h3 {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        #keyDisplay .warning-text {
+            font-size: 0.9rem;
+            color: #d9534f; /* Warna merah untuk peringatan */
+            background-color: #fdf7f7;
+            border: 1px solid #f5c6cb;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        /* --- Wrapper Input Key & Tombol Copy (Responsif) --- */
+        .generated-key-wrapper {
+            display: flex;
+            /* Fleksibel: di layar kecil, tombol bisa di bawah */
+            flex-wrap: wrap; 
+            gap: 8px; /* Jarak antar elemen */
+        }
+
+        .generated-key-wrapper input[readonly] {
+            flex-grow: 1; /* Input mengambil sisa ruang */
+            min-width: 200px; /* Lebar minimum input */
+            font-family: "Courier New", Courier, monospace;
+            font-weight: bold;
+            background-color: #f4f4f4;
+            color: #333;
+            border-color: #ddd;
+        }
+
+        .btn-copy {
+            padding: 0.8rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #28a745; /* Warna hijau untuk "Copy" */
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            flex-shrink: 0; /* Tombol tidak akan mengecil */
+        }
+
+        .btn-copy:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="api-key-container">
+        <h2>Generate API Key Baru</h2>
+        <p class="container-description">
+            Key digunakan untuk mengautentikasi permintaan Anda ke API.
+        </p>
+
+        <form id="apiKeyForm">
+            <div class="form-group">
+                <label for="keyName">Nama Key</label>
+                <input type="text" id="keyName" name="keyName" 
+                       placeholder="Misal: 'Aplikasi Web Saya'" required>
+            </div>
+
+            <div class="form-group">
+                <label for="keyPermissions">Izin (Permissions)</label>
+                <select id="keyPermissions" name="keyPermissions">
+                    <option value="read">Read-Only (Hanya Baca)</option>
+                    <option value="write">Read & Write (Baca & Tulis)</option>
+                    <option value="admin">Admin (Akses Penuh)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-generate">Generate Key</button>
+        </form>
+
+        <div id="keyDisplay" style="display: none;">
+            <h3>Key Berhasil Dibuat!</h3>
+            <p class="warning-text">
+                <strong>Peringatan:</strong> Salin key Anda sekarang. 
+                Anda tidak akan dapat melihatnya lagi setelah menutup halaman ini.
+            </p>
+            
+            <div class="generated-key-wrapper">
+                <input type="text" id="generatedKey" readonly>
+                <button type="button" id="copyButton" class="btn-copy">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Catatan: Ini hanya JavaScript sisi klien (demo) ---
+        // Di aplikasi nyata, Anda akan mengirim form ini ke server
+        // (backend) untuk membuat dan menyimpan key secara aman.
+
+        const apiKeyForm = document.getElementById('apiKeyForm');
+        const keyDisplay = document.getElementById('keyDisplay');
+        const generatedKeyInput = document.getElementById('generatedKey');
+        const copyButton = document.getElementById('copyButton');
+
+        // 1. Tangani submit form
+        apiKeyForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah form reload halaman
+
+            // Ambil nama key (di aplikasi nyata, ini dikirim ke server)
+            const keyName = document.getElementById('keyName').value;
+            const keyPermissions = document.getElementById('keyPermissions').value;
+
+            // --- Simulasi Pembuatan Key ---
+            // Di sini Anda akan memanggil backend Anda (misal: via fetch())
+            // Untuk demo, kita buat key palsu di sini.
+            const fakeKey = 'sk_live_' + crypto.randomUUID().replace(/-/g, '');
+            
+            // Tampilkan key ke pengguna
+            generatedKeyInput.value = fakeKey;
+            keyDisplay.style.display = 'block';
+
+            // Reset tombol copy
+            copyButton.textContent = 'Copy';
+            copyButton.disabled = false;
+        });
+
+        // 2. Tangani fungsionalitas tombol "Copy"
+        copyButton.addEventListener('click', function() {
+            // Gunakan API Clipboard modern yang lebih aman
+            navigator.clipboard.writeText(generatedKeyInput.value).then(() => {
+                // Beri feedback visual ke pengguna
+                copyButton.textContent = 'Tersalin!';
+                copyButton.disabled = true;
+
+                // Kembalikan ke teks semula setelah 2 detik
+                setTimeout(() => {
+                    copyButton.textContent = 'Copy';
+                    copyButton.disabled = false;
+                }, 2000);
+            }).catch(err => {
+                console.error('Gagal menyalin key: ', err);
+                alert('Gagal menyalin key. Mohon salin secara manual.');
+            });
+        });
+    </script>
+
+</body>
+</html>
